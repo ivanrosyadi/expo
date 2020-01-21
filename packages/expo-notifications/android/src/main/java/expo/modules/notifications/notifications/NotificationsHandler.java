@@ -11,9 +11,11 @@ import org.unimodules.core.arguments.ReadableArguments;
 import org.unimodules.core.interfaces.ExpoMethod;
 import org.unimodules.core.interfaces.services.EventEmitter;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import expo.modules.notifications.notifications.interfaces.NotificationBuilder;
 import expo.modules.notifications.notifications.interfaces.NotificationListener;
 import expo.modules.notifications.notifications.interfaces.NotificationManager;
 
@@ -21,7 +23,7 @@ public class NotificationsHandler extends ExportedModule implements Notification
   private final static String EXPORTED_NAME = "ExpoNotificationsHandlerModule";
 
   private NotificationManager mNotificationManager;
-  private EventEmitter mEventEmitter;
+  private ModuleRegistry mModuleRegistry;
 
   private Map<String, SingleNotificationHandlerTask> mTasksMap = new HashMap<>();
 
@@ -36,7 +38,7 @@ public class NotificationsHandler extends ExportedModule implements Notification
 
   @Override
   public void onCreate(ModuleRegistry moduleRegistry) {
-    mEventEmitter = moduleRegistry.getModule(EventEmitter.class);
+    mModuleRegistry = moduleRegistry;
 
     // Register the module as a listener in NotificationManager singleton module.
     // Deregistration happens in onDestroy callback.
@@ -47,6 +49,10 @@ public class NotificationsHandler extends ExportedModule implements Notification
   @Override
   public void onDestroy() {
     mNotificationManager.removeListener(this);
+    Collection<SingleNotificationHandlerTask> tasks = mTasksMap.values();
+    for (SingleNotificationHandlerTask task : tasks) {
+      task.stop();
+    }
   }
 
   @ExpoMethod
@@ -57,17 +63,12 @@ public class NotificationsHandler extends ExportedModule implements Notification
       promise.reject("ERR_NOTIFICATION_HANDLED", message);
       return;
     }
-    try {
-      task.handleResponse(behavior);
-      promise.resolve(null);
-    } catch (Exception e) {
-      promise.reject(e);
-    }
+    task.handleResponse(behavior, promise);
   }
 
   @Override
   public void onMessage(RemoteMessage message) {
-    SingleNotificationHandlerTask task = new SingleNotificationHandlerTask(mEventEmitter, message, this);
+    SingleNotificationHandlerTask task = new SingleNotificationHandlerTask(getContext(), mModuleRegistry, message, this);
     mTasksMap.put(task.getIdentifier(), task);
     task.start();
   }
