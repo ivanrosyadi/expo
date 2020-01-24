@@ -28,7 +28,7 @@
 	<key>NSCalendarsUsageDescription</key>
 	<string>Allow Expo experiences to access your calendar</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Allow Expo experiences to use your camera</string>
+	<string>Allow Expo experiences to use your camera. This application uses the camera to take photos of user profiles and photos of store products</string>
 	<key>NSContactsUsageDescription</key>
 	<string>Allow Expo experiences to access your contacts</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
@@ -40,7 +40,7 @@
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Give Expo experiences permission to save photos</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Give Expo experiences permission to access your photos</string>
+	<string>Give Expo experiences permission to access your photos. This application uses a photo library to add product photos to service shops</string>
 	<key>NSRemindersUsageDescription</key>
 	<string>Allow Expo experiences to access your reminders</string>
 	<key>UILaunchStoryboardName</key>
